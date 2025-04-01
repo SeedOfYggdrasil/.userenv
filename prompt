@@ -44,7 +44,7 @@ setp() {
     input=$1
     c1=${2:-"cyan"}; c1=${!c1}
     c2=${3:-"bold_green"}; c2=${!c2}
-    c3=${4:-"bold_purple"}; c3=${!c3}
+    c3=${4:-"greener"}; c3=${!c3}
 
     load_prompt $input $c1 $c2 $c3
 }
