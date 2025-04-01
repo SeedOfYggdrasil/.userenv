@@ -15,17 +15,16 @@ prep_gui() {
 prep_gui
 
 chkshell() {
-    if [ "$shell_loaded" -ne 1 ]; then
+    if [ -n "$shell_loaded" ]; then
         exit 0 &>/dev/null
     fi
- 
     export shell_loaded=1
 }
 chkshell
 
 # Force reload shell
 unload() {
-    unset loaded
+    unset shell_loaded
     source ~/.bashrc
 }
 
@@ -44,14 +43,32 @@ _userenv() {
     )
 	local dir=$HOME/.userenv 
 
-    echo -e "${cyan}Loading shell${purplest}:${yellow}#!/bin/bash${purplest}:${nc}"
+    echo -e "${cyan}Loading shell${purplest}:${bold_purple}webnexus:${nc}"
 	if [ -d "$dir" ]; then
 		for file in "${files[@]}"; do
 			[ -f "${dir}/$file" ] && source "${dir}/$file"
-			echo -e "${green}	successfully loaded ${bold_purple}${file}${green} configuration${nc}"
+                echo -e "${bold_green}Loaded ${cyan}${file} ${bold_green} 
+config!${nc}"
 			sleep 0.3
 		done
-	fi
+	setp 1
+    fi
+}
+
+_env() {
+    local file="$HOME/.env"
+    if [ -e "$file" ] && [ -f "$file" ]; then
+        source "$file"  
+        vars=(
+            PREFIX
+            GH_TOKEN
+        )
+        for var in "${vars[@]}"; do
+            if [ -n "$var" ]; then
+                unset "$var"
+            fi
+        done
+    fi
 }
 
 _nvm() {
@@ -60,35 +77,24 @@ _nvm() {
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 }
 
-_env() {
-    local file="$HOME/.env"
-    if [ -e "$file" ] && [ -f "$file" ]; then
-        source "$file"  
-    fi
-
-    vars=(
-        PREFIX
-        GH_TOKEN
-    )
-    for var in "${vars[@]}"; do
-        if [ -n "$var" ]; then
-            unset "$var"
-        fi
-    done
-}
 
 _load_shell() {
-    clear
     _path
     _env
     _userenv
     _nvm
-    sleep 0.5
-    clear
 }
 
 if [[ $- != *i* ]]; then
     exit 0
 else
-    _load_shell && export shell_loaded=1
+    clear
+    _load_shell
+    sleep 0.5
+    clear
+fi
+
+# Other
+if [ -f "$HOME/.userenv/prompt" ]; then
+    alias prompt='$EDITOR ~/.userenv/prompt'
 fi
