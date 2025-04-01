@@ -6,26 +6,24 @@ case $- in
 esac
 
 prep_gui() {
-    local f=$HOME/.loud_gui.sh
+    local f=$HOME/.load_gui.sh
 
     if [ -e "$f" ] && [ -f "$f" ]; then
         source "$f" || return 1
     fi
 }
-prep_gui
+# prep_gui
 
 chkshell() {
     if [ "$shell_loaded" -ne 1 ]; then
         exit 0 &>/dev/null
     fi
- 
-    export shell_loaded=1
 }
 chkshell
 
 # Force reload shell
 unload() {
-    unset loaded
+    unset shell_loaded
     source ~/.bashrc
 }
 
@@ -38,13 +36,13 @@ _path() {
 _userenv() {
 	files=(
 		color	# human-readable color-code variables
-        prompt	# command prompt configuration
 		server  # web-server configurations
         user	# user-specific configurations
+        prompt  # customize prompt
     )
 	local dir=$HOME/.userenv 
 
-    echo -e "${cyan}Loading shell${purplest}:${yellow}#!/bin/bash${purplest}:${nc}"
+    echo -e "${cyan}Loading shell${purplest}:${yellow}$HOSTNAME${purplest}:${nc}"
 	if [ -d "$dir" ]; then
 		for file in "${files[@]}"; do
 			[ -f "${dir}/$file" ] && source "${dir}/$file"
@@ -78,17 +76,19 @@ _env() {
 }
 
 _load_shell() {
-    clear
     _path
     _env
     _userenv
     _nvm
-    sleep 0.5
-    clear
 }
 
 if [[ $- != *i* ]]; then
-    exit 0
+    exit 0 &>/dev/null
 else
-    _load_shell && export shell_loaded=1
+    clear
+    _load_shell 
+    export shell_loaded=1
+    sleep 0.5
+    clear
+    setp 1
 fi

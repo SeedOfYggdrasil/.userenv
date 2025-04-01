@@ -7,41 +7,46 @@ load_prompt() {
     local c1=$2
     local c2=$3
     local c3=$4
-    local s0=$5
     local c0=${nc}
 
     if [ -z $input ] || [ $input == "" ]; then
         local input=0
     fi
 
-    clear
+    if [ "$USER" == "root" ]; then
+        local s0="#"
+    else
+        local s0="$"
+    fi
+
     case $input in
-        "1") PS1="\[$c1\]\u\[$c3\]:\[$c2\]\w\[$c3\]${s}\[$c0\] " ;;
-        "2") PS1="\[$c1\]\u\[$c3\]@\[$c1\]\h\n\[$c2\]\w\[$c3\]${s0}\[$c0\] " ;;
-        "3") PS1="\[$c2\]\w\n\[$c1\]\u\[$c3\]${s0}\[$c0\] " ;;
-        "4") PS1="\[$c1\]\u\n\[$c2\]\w\[$c3\]${s0}\[$c0\] " ;;
-        "*") echo "Choose: \'(1)\' \'(2)\' \'(3)\'" && exit 0 &>/dev/null
+        "1") PS1="\[$c1\]\u\[$c3\]:\[$c2\]\w\[$c3\]$s0\[$c0\] "; clear ;;
+        "2") PS1="\[$c1\]\u\[$c3\]@\[$c1\]\h\n\[$c2\]\w\[$c3\]$s0\[$c0\] "; clear ;;
+        "3") PS1="\[$c2\]\w\n\[$c1\]\u\[$c3\]$s0\[$c0\] "; clear ;;
+        "4") PS1="\[$c1\]\u\n\[$c2\]\w\[$c3\]$s0\[$c0\] "; clear ;;
+        "5") PS1="\[$c1\]\u\[$c3\]@\[$c1\]\h\[$c3\]:\[$c2\]\w\[$c3\]$s0\[$c0\] "; clear ;;
+        "6") PS1="\[$c1\]\u\[$c3\]@\[$c1\]\h\[$c3\]:\[$c2\]\w\[$c3\]\n$s0\[$c0\] "; clear ;;
+        "*") echo "Choose: \'(1)\' \'(2)\' \'(3)\' \'(4)\' \'(5)\'"
     esac
 }
 
-setp() {
-    if [ "$USER" == "root" ]; then
-        local s0='#'
-    else
-        local s0='$'
-    fi
+chk_color() {
     local f="$HOME/.userenv/color"
     if [ -z "${userenv_colors}" ];
-then
+    then
         [  -e "$f" ] && [ -f "$f" ] && source "$f" || PS1="\u@\h:\w${s} " && exit 0 &>/dev/null
     fi
+}
+
+setp() {
+    chk_color
 
     input=$1
-    c1=${2:-"bold_red"}; c1=${!c1}
-    c2=${3:-"bold_purple"}; c2=${!c2}
-    c3=${4:-"bold_yellow"}; c3=${!c3}
+    c1=${2:-"cyan"}; c1=${!c1}
+    c2=${3:-"bold_green"}; c2=${!c2}
+    c3=${4:-"bold_purple"}; c3=${!c3}
 
-    load_prompt $input $c1 $c2 $c3 $s0
+    load_prompt $input $c1 $c2 $c3
 }
 
 if [ -z "PS1" ] || [ "PS1" == "" ]; then
