@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# ~/(dot)userenv/user
+# 3.22.25
+
+# Package Management
+alias c='clear'
+alias i='pkg install $1'
+alias u='pkg update && pkg upgrade -y'
+alias m='micro $1'
+
+# Clipboard
+alias tcs='termux-clipboard-set'
+alias tcg='termux-clipboard-get'
+alias x='tcs'
+alias p='tcg'
+
+# Display info 
+alias myip='echo "${ip}"'
+alias lanip='echo "${lan}"'
+alias serverip='echo "$vps_ip"'
+
+# Local server
+alias serve='python -m http.server ${1:-8000}'
+alias getall='wget -r http://localhost:${1:-8000}'
+alias getfile='wget http://localhost:${1:-8000}/$2'
+
+# Development
+alias addenv='python -m venv ${1:-"venv"} && source ${1:-"venv"}/bin/activate'
+
+commitgit() {
+	local rootdir=${1:-"$HOME/projects/app"}
+	local msg="${2:-"Pushed Updates to Remote Branch"}"
+	local branch=${3:-"main"}
+	[ -f "$rootdir" ] && cd "$rootdir"
+	git add .
+	git commit -m "$msg"
+	git push origin $branch || git pull origin $branch && git push origin $branch
+}
+
+# System
+
+termux() {
+local dir=/data/data/com.termux/files/usr
+if [ -z "$PREFIX" ] && [ -e "$dir" ]; then
+    export PREFIX="/data/data/com.termux/files/usr"
+    export root="/data/data/com.termux/files/usr"
+    export etc=$root/etc
+fi
+}
+
+# General
+export user=$(whoami)
+# export home="/data/data/com.termux/files/home"
+
+# User Scripts
+export gk=$HOME/.userenv/gk
+export gkf=$gk/functions
+export gkc=$gk/files/config
+
+getgk() {
+    source $gkf/${1:-"*.sh"}
+    source "${gkc}/*"
+}
+
+err() {
+    local msg=${1:-"Failed"}
+    echo -e "${bold_red}ERROR${nc}: $msg"
+    return 1
+}
+
+go() {
+    local dir=${1:-"$HOME"}
+    if  [ ! -d "$dir" ]; then
+        err "Invalid target"
+        return 1
+    else
+        cd "$dir" && clear
+        sudo ls -a
+        echo
+    fi
+}

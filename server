@@ -1,0 +1,48 @@
+# ~/.userenv/server
+
+# Nginx
+export nginxdir=/etc/nginx
+export confdir=/etc/nginx/sites-available
+export linkdir=/etc/nginx/sites-enabled
+export sudir=/home/www
+export webdir=/var/www
+export h3pconf=$confdir/h3p
+export apconf=$confdir/ap
+export h3p=$webdir/h3p.tech
+export ap=$webdir/alexpariah.live
+export dnd=$webdir/dnd
+alias reload='sudo systemctl restart nginx && sudo nginx -t'
+alias stop='sudo systemctl stop nginx'
+alias start='sudo systemctl start nginx'
+alias status='sudo systemctl status nginx'
+
+# Ngrok
+setup_ngrok() {
+    echo "Installing Ngrok..."
+
+    curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null	&& echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update &>/dev/null && sudo apt install ngrok &>/dev/null && ngrok config add-authtoken $ngrok_auth
+
+    echo "Complete"
+ }
+
+run_ngrok() {
+    local url=https://pumped-miserably-ferret.ngrok-free.app
+    local opt=$1
+    local port=${2:-3000}    
+
+    if ! command ngrok; then
+        setup_ngrok
+    fi
+
+    if [ "$opt" != "-s" ]; then
+        ngrok http http://localhost:$port
+    else
+        ngrok http --url=$url $port   
+    fi
+}
+
+# opensaas
+
+export appdir=$HOME/dev/templates/opensaas/app
+export blogdir=$HOME/dev/templates/opensaas/blog
+
